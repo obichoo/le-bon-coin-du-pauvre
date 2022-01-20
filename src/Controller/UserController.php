@@ -5,8 +5,10 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -31,16 +33,24 @@ class UserController extends AbstractController
     /**
      * @Route("/new", name="user")
      */
-    public function new(EntityManagerInterface $entityManager): Response
+    public function new(Request $request,EntityManagerInterface $entityManager, UserPasswordHasherInterface $hasher): Response
     {
-        $user = new User();
-        $user->setFirstName('Pablo')
-            ->setLastName('Escobar')
-            ->setEmail('test' . rand(1,1000) . '@gmail.com');
+        if ($request->isMethod('POST')){
+            $requestObj = $request->request;
+            if (!empty($requestObj->get('password'))
+                && !empty($requestObj->get('passwordVerify'))
+                && $request->request->get('password') === $requestObj->get('passwordVerify')
+                && $this->isCsrfTokenValid('register_form',$requestObj->get('csrf'))) {
+                $user = new User();
+                $user->setFirstName($requestObj->get('firstName'))
+                    ->setLastName('lastName')
+                    ->setEmail('email')
+                    ->setPassword($hasher->hashPassword($user,$requestObj->get('password')));
 
-        $entityManager->persist($user);
-        $entityManager->flush($user);
-
-        return new Response(sprintf('Giga bien le gars #%d -> %s', $user->getId(), $user->getEmail()));
+                $entityManager->persist($user);
+                $entityManager->flush();
+            }
+        }
+        return $this->render('user/new.html.twig');
     }
 }
