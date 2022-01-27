@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello AdController!{% endblock %}
+
+{% block body %}
+    <div>
+        {% for ad in ads %}
+        <article>
+            <form action="{{ path('lbcdp_ads_vote', { slug:ad.slug }) }}" method="post">
+                <button name="vote" value="up">Up</button>
+                <button name="vote" value="down">Down</button>
+                <p>{{ ad.displayVote }}</p>
+            </form>
+        </article>
+        {% endfor %}
+    </div>
+{% endblock %}
