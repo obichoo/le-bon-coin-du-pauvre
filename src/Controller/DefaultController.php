@@ -15,9 +15,9 @@ class DefaultController extends AbstractController
     public function index(AdRepository $adRepository): Response
     {
 
-        dd($adRepository->findAll());
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
+            'ads'=>$adRepository->findAll()
         ]);
     }
 }
