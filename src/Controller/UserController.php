@@ -65,15 +65,12 @@ class UserController extends AbstractController
     }
 
     /**
-     * @param UserRepository $userRepository
-     * @param EntityManagerInterface $entityManager
-     * @param $email
+     * @param User $user
      * @return Response
      * @Route("/show/{email}",name="lbcdp_show")
      */
-    public function show(UserRepository $userRepository,EntityManagerInterface $entityManager,$email): Response
+    public function show(User $user): Response
     {
-        $user = $userRepository->findOneBy(['email'=>$email]);
         $this->denyAccessUnlessGranted('USER_VIEW',$user);
         return $this->render('user/show.html.twig', ['user' => $user]);
     }
