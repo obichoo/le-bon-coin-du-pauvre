@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\AdRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity(repositoryClass=AdRepository::class)
@@ -20,22 +21,33 @@ class Ad
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $title;
+    private ?string $title;
 
     /**
      * @ORM\Column(type="string", length=1000, nullable=true)
      */
-    private $description;
+    private ?string $description;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $price;
+    private ?float $price;
 
     /**
      * @ORM\ManyToOne(targetEntity=Ad::class, inversedBy="tags")
      */
-    private $tags;
+    private ?Ad $tags;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private int $votes = 0;
+
+    /**
+     * @ORM\Column(type="string", length=255, unique=true)
+     * @Gedmo\Slug(fields={"title"})
+     */
+    private ?string $slug;
 
     public function getId(): ?int
     {
@@ -87,6 +99,48 @@ class Ad
     {
         $this->tags = $tags;
 
+        return $this;
+    }
+
+    public function getVotes(): ?int
+    {
+        return $this->votes;
+    }
+
+    public function setVotes(int $votes): self
+    {
+        $this->votes = $votes;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function displayVote(): string
+    {
+        $prefix = $this->getVotes() > 0 ? '+' : (!$this->getVotes() < 0 ?: '-');
+        return sprintf('%s %d',$prefix, abs($this->getVotes()));
+    }
+
+    public function upVote(): self
+    {
+        $this->votes++;
+        return $this;
+    }
+
+    public function downVote(): self
+    {
+        $this->votes--;
         return $this;
     }
 }
