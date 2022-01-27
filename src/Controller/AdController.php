@@ -29,6 +29,7 @@ class AdController extends AbstractController
      * @Route("/ad/{slug}/vote", name="lbcdp_ads_vote", methods="POST")
      * @param Ad $ad
      * @param Request $request
+     * @param EntityManagerInterface $entityManager
      * @return Response
      */
     public function vote(Ad $ad, Request $request, EntityManagerInterface $entityManager): Response
